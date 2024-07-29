@@ -1,13 +1,7 @@
 #!/bin/bash
 
-# Required varibales
-COUNTRY="IE"
-STATE="GALWAY"
-LOCALITY="GALWAY"
-ORG="QUAY"
-ORG_UNIT="DOCS"
-COMMON_NAME="rajakumar.apps.quay3113.cp.fyre.ibm.com"
-BASTION_IP="9.30.235.129"
+# deploy build properties
+source ../build-properties.sh
 
 ## creating certificate ##
 

@@ -6,35 +6,9 @@ source ./creating_ssl_certs_quay.sh
 # check for config.yaml, ssl.cert nd ssl.key
 if [ -f ./config.yaml ]; then
 	echo "config.yaml is available"
-	if [ -d ./openssl/ ]; then
-		echo "openssl directory is created"
-		ls -l ./openssl/
-		mv ./openssl/ssl.cert .
-		mv ./openssl/ssl.key .
-	else
-		echo "Create openssl certificates"
-	fi
 else
-	echo "Create config.yaml file"
-	cat > config.yaml <<EOF
-SERVER_HOSTNAME: rajakumar.apps.quay3113.cp.fyre.ibm.com
-PREFERRED_URL_SCHEME: https
-FEATURE_UI_V2: true
-FEATURE_UI_V2_REPO_SETTINGS: true
-FEATURE_AUTO_PRUNE: true
-ROBOTS_DISALLOW: false
-BROWSER_API_CALLS_XHR_ONLY: false
-SUPER_USERS:
-  - quay
-EOF
-        if [ -d ./openssl/ ]; then
-                echo "openssl directory is created"
-                ls -l ./openssl/
-                mv ./openssl/ssl.cert .
-                mv ./openssl/ssl.key .
-        else
-                echo "Create openssl certificates"
-        fi
+	echo "Please create config.yaml file"
+	exit 1
 fi
 
 # Create a config bundle secret
@@ -48,11 +22,11 @@ else
 fi
 
 # Create quay-registry.yaml file with unmanaged tls component
-cat > quay-registry.yaml <<EOF
+cat <<EOF | oc apply -f -
 apiVersion: quay.redhat.com/v1
 kind: QuayRegistry
 metadata:
-  name: quayreg39
+  name: quayreg3
   namespace: quay-registry
 spec:
   configBundleSecret: test-config-bundle
@@ -81,5 +55,4 @@ spec:
     managed: false
 EOF
 
-oc create -f quay-registry.yaml
 
