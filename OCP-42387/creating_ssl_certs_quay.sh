@@ -6,6 +6,7 @@ source ../build-properties.sh
 ## creating certificate ##
 
 # Generate the rootCA private key
+cd ./config/
 openssl genrsa -out rootCA.key 2048
 
 # Generate the root CA certificate

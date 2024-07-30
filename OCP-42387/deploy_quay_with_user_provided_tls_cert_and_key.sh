@@ -4,6 +4,7 @@
 source ./creating_ssl_certs_quay.sh
 
 # check for config.yaml, ssl.cert nd ssl.key
+cd ./config/
 if [ -f ./config.yaml ]; then
 	echo "config.yaml is available"
 else
@@ -26,7 +27,7 @@ cat <<EOF | oc apply -f -
 apiVersion: quay.redhat.com/v1
 kind: QuayRegistry
 metadata:
-  name: quayreg3
+  name: quayreg$(date +%Y%m%d%H%M%S)
   namespace: quay-registry
 spec:
   configBundleSecret: test-config-bundle
@@ -54,5 +55,3 @@ spec:
   - kind: mirror
     managed: false
 EOF
-
-
