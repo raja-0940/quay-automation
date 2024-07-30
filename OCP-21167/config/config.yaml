@@ -1,0 +1,22 @@
+SERVER_HOSTNAME: <quay-endpoint>
+PREFERRED_URL_SCHEME: https
+FEATURE_UI_V2: true
+FEATURE_UI_V2_REPO_SETTINGS: true
+FEATURE_AUTO_PRUNE: true
+ROBOTS_DISALLOW: false
+BROWSER_API_CALLS_XHR_ONLY: false
+SUPER_USERS:
+  - quay
+DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS:
+  - default
+DISTRIBUTED_STORAGE_PREFERENCE:
+  - default
+DISTRIBUTED_STORAGE_CONFIG:
+  default:
+    - S3Storage
+    - s3_bucket: <s3-bucket>
+      storage_path: /datastorage
+      s3_access_key: <aws-access-key>
+      s3_secret_key: <aws-secret>
+      host: s3.us-east-1.amazonaws.com
+
