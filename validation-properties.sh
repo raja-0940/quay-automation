@@ -5,16 +5,16 @@
 # Source registry variables
 SRC_REGISTRY="quay.io" # example source registry
 SRC_REPO="quay-qetest" # example source repository
-SRC_IMAGE="ubuntu" # example source image name
+SRC_IMAGE="alpine" # example source image name
 SRC_TAG="latest" # example source image tag
-SRC_REG_USER_NAME="src-reg-usr-name"
-SRC_REG_PASSWORD="src-reg-password"
+SRC_REG_USER_NAME="<src-reg-user>"
+SRC_REG_PASSWORD="<src-reg-password>"
 
 
 # Destination registry variables.
-DEST_REGISTRY="<quay-registry-end-point>"
-DEST_REPO="<dest-repository>"
-DEST_IMAGE="<dest-image-name>"
-DEST_TAG="<destination-image-tag>"
-DEST_REG_USER_NAME="<dest-reg-usr-name>"
+DEST_REGISTRY="<quayregistry-end-point>"
+DEST_REPO="<dest-repo>"
+DEST_IMAGE="<dest-image>"
+DEST_TAG="<dest-tag>"
+DEST_REG_USER_NAME="<dest-reg-user>"
 DEST_REG_PASSWORD="<dest-reg-password>"
