@@ -107,3 +107,32 @@ function getInfoofMultiarchManifests {
 }
 
 # getInfoofMultiarchManifests
+
+# OCP-21050 - [Quay-987] Show error when pull a deleted manifest by digest
+
+function pulImagebyDigest {
+  tag="386"
+  podman login -u ${SRC_REG_USER_NAME} -p ${SRC_REG_PASSWORD} ${SRC_REGISTRY}
+  podman pull ${SRC_REGISTRY}/${SRC_REPO}/${SRC_IMAGE}:$tag
+  podman tag ${SRC_REGISTRY}/${SRC_REPO}/${SRC_IMAGE}:$tag ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:$tag
+  podman push --tls-verify=false --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:$tag
+  podman rmi ${SRC_REGISTRY}/${SRC_REPO}/${SRC_IMAGE}:$tag
+  podman rmi ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:$tag
+
+  # pull image by digest
+
+  # using API call
+  curl -k -X GET -H "Authorization: Bearer ${QUAY_API_TOKEN}" \
+  https://${DEST_REGISTRY}/api/v1/repository/${DEST_REPO}/${DEST_IMAGE}/tag/ |jq .
+
+  # using podman pull
+  podman pull --tls-verify=false --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:$tag
+  podman images
+
+  # Delete the image from Quay UI and try to pull the image by digest. It will fail with error
+  # podman rmi ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:$tag
+  # podman pull ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:$tag
+}
+
+pulImagebyDigest
+
