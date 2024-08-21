@@ -90,3 +90,5 @@ function getInfoofMultiarchManifests {
 
 }
 
+# getInfoofMultiarchManifests
+
