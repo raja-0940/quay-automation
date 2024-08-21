@@ -3,7 +3,7 @@
 ## setting validation properties
 source ./validation-properties.sh
 
-if [ $(jq --version | cut -d '/' -f1) == "jq" ]; then
+if [ $(jq --version | cut -d '-' -f1) == "jq" ]; then
   echo "jq tool is available"
 else
   echo "installing jq.."
@@ -61,14 +61,12 @@ function push_multiarch_images {
 # push_multiarch_images
 
 
-}
-
 # ocp-20944 should get info about multiarch manifests via API
 function getInfoofMultiarchManifests {
 
   # Copy any multiarch image from the remote registry
 
-  if [ $(skopeo --version | cut -d '/' -f1) == "skopeo" ]; then
+  if [ $(skopeo --version | cut -d ' ' -f1) == "skopeo" ]; then
     echo "skopeo tool is availble"
     echo "$(skopeo --version)"
     skopeo copy --src-creds=${SRC_REG_USER_NAME}:${SRC_REG_PASSWORD} --dest-creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} \
@@ -92,15 +90,17 @@ function getInfoofMultiarchManifests {
   # get information about multi-arch manifests via API
   echo "Get information about multi-arch manifests via API"
   MANIFEST_DIGEST="$(curl -k -X GET -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
-  https://${DEST_REGISTRY}/api/v1/repository/${DEST_REPO}/${DEST_IMAGE}/tag/ |jq '.tags[0].manifest_digest')"
+  https://${DEST_REGISTRY}/api/v1/repository/${DEST_REPO}/${DEST_IMAGE}/tag/ |jq '.tags[0].manifest_digest' | tr -d '"')"
+  echo "****************************${MANIFEST_DIGEST}**************************"
   curl -k -X GET -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
   https://${DEST_REGISTRY}/api/v1/repository/${DEST_REPO}/${DEST_IMAGE}/manifest/${MANIFEST_DIGEST} |jq .
 
   # get information about  specific arch  manifests via API
   echo "Get information about  specific arch  manifests via API"
-  DIGEST=$(curl -k -X GET -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
+  DIGEST="$(curl -k -X GET -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
   https://${DEST_REGISTRY}/api/v1/repository/${DEST_REPO}/${DEST_IMAGE}/manifest/${MANIFEST_DIGEST} |\
-  jq .manifest_data | sed 's/^"//;s/"$//' | tr -d '\' | jq .manifests[0].digest)
+  jq .manifest_data | sed 's/^"//;s/"$//' | tr -d '\' | jq .manifests[0].digest | tr -d '"')"
+  echo "*************************${DIGEST}*******************************"
   curl -k -X GET -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
   https://${DEST_REGISTRY}/api/v1/repository/${DEST_REPO}/${DEST_IMAGE}/manifest/${DIGEST} |jq .
 
