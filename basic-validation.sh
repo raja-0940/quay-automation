@@ -46,7 +46,7 @@ function push_multiarch_images {
       ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:arm64 \
       ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:s390x \
       ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:386 --amend
-    podman manifest push --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} --tls-verify=fasle ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
+    podman manifest push --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} --tls-verify=false ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
     podman rmi ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
     podman pull --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} --tls-verify=fasle ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
     # podman login -u ${DEST_REG_USER_NAME} -p ${DEST_REG_PASSWORD} ${DEST_REGISTRY}
@@ -135,4 +135,63 @@ function pulImagebyDigest {
 }
 
 pulImagebyDigest
+
+
+# This function deploys QuayRegistry with all managed components. ( OCP-42377, 42399, 42404 and 42375 )
+
+function deployQuayregistrywithAllManagedComponents {
+
+  # Create config.yaml
+  cat >> ./config.yaml <<EOF
+SERVER_HOSTNAME: <quay-end-point>
+PREFERRED_URL_SCHEME: https
+FEATURE_UI_V2: true
+FEATURE_UI_V2_REPO_SETTINGS: true
+FEATURE_AUTO_PRUNE: true
+ROBOTS_DISALLOW: false
+BROWSER_API_CALLS_XHR_ONLY: false
+SUPER_USERS:
+  - quay
+EOF
+  
+  # Create config-bundle-secret from config.yaml file
+  oc create secret generic --from-file config.yaml=./config.yaml config-bundle-secret
+
+  # Create quay-registry.yaml file with all managed components
+  cat <<EOF | oc apply -f -
+apiVersion: quay.redhat.com/v1
+kind: QuayRegistry
+metadata:
+  name: quayreg$(date +%Y%m%d%H%M%S)
+  namespace: quay-registry
+spec:
+  configBundleSecret: test-config-bundle
+  components:
+  - kind: postgres
+    managed: true
+  - kind: objectstorage
+    managed: true 
+  - kind: redis
+    managed: true
+  - kind: route
+    managed: true
+  - kind: monitoring
+    managed: true
+  - kind: tls
+    managed: true
+  - kind: quay
+    managed: true
+  - kind: clair
+    managed: true
+  - kind: clairpostgres
+    managed: true
+  - kind: horizontalpodautoscaler
+    managed: true
+  - kind: mirror
+    managed: true
+EOF
+
+}
+
+deployQuayregistrywithAllManagedComponents
 
