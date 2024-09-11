@@ -48,7 +48,7 @@ function push_multiarch_images {
       ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:386 --amend
     podman manifest push --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} --tls-verify=false ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
     podman rmi ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
-    podman pull --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} --tls-verify=fasle ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
+    podman pull --creds=${DEST_REG_USER_NAME}:${DEST_REG_PASSWORD} --tls-verify=false ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
     # podman login -u ${DEST_REG_USER_NAME} -p ${DEST_REG_PASSWORD} ${DEST_REGISTRY}
     # podman manifest push ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
     # podman rmi ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:latest
@@ -134,16 +134,13 @@ function pulImagebyDigest {
   # podman pull ${DEST_REGISTRY}/${DEST_REPO}/${DEST_IMAGE}:$tag
 }
 
-pulImagebyDigest
-
-
-# This function deploys QuayRegistry with all managed components. ( OCP-42377, 42399, 42404 and 42375 )
+# pulImagebyDigest
 
 function deployQuayregistrywithAllManagedComponents {
 
   # Create config.yaml
   cat >> ./config.yaml <<EOF
-SERVER_HOSTNAME: <quay-end-point>
+SERVER_HOSTNAME: ${DEST_REGISTRY}
 PREFERRED_URL_SCHEME: https
 FEATURE_UI_V2: true
 FEATURE_UI_V2_REPO_SETTINGS: true
@@ -153,7 +150,7 @@ BROWSER_API_CALLS_XHR_ONLY: false
 SUPER_USERS:
   - quay
 EOF
-  
+
   # Create config-bundle-secret from config.yaml file
   oc create secret generic --from-file config.yaml=./config.yaml config-bundle-secret
 
@@ -165,12 +162,12 @@ metadata:
   name: quayreg$(date +%Y%m%d%H%M%S)
   namespace: quay-registry
 spec:
-  configBundleSecret: test-config-bundle
+  configBundleSecret: config-bundle-secret
   components:
   - kind: postgres
     managed: true
   - kind: objectstorage
-    managed: true 
+    managed: true
   - kind: redis
     managed: true
   - kind: route
@@ -193,5 +190,4 @@ EOF
 
 }
 
-deployQuayregistrywithAllManagedComponents
-
+# deployQuayregistrywithAllManagedComponents
