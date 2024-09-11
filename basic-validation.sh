@@ -136,6 +136,8 @@ function pulImagebyDigest {
 
 # pulImagebyDigest
 
+## This function deploys QuayRegistry with all managed components. ( OCP-42377, 42399, 42404 and 42375 )
+
 function deployQuayregistrywithAllManagedComponents {
 
   # Create config.yaml
