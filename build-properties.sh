@@ -16,3 +16,5 @@ export AWS_REGION=""
 export AWS_S3_BUCKET_NAME=""
 export SERVER_HOSTNAME=""
 export AWS_HOST=""
+
+envsubst < ./standalonequay/config.yaml
