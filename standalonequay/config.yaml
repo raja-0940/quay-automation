@@ -1,4 +1,4 @@
-PREFERRED_URL_SCHEME: http
+PREFERRED_URL_SCHEME: https
 ExternalTLSTermination: false
 REGISTRY_TITLE: Red Hat Quay
 REGISTRY_TITLE_SHORT: Red Hat Quay
@@ -15,9 +15,14 @@ USER_EVENTS_REDIS:
     port: 6379
     password: strongpassword
 SERVER_HOSTNAME: ${SERVER_HOSTNAME}
+DISTRIBUTED_STORAGE_CONFIG:
+    default:
+        - LocalStorage
+        - storage_path: /datastorage/registry
 DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+DISTRIBUTED_STORAGE_PREFERENCE:
+    - default
 AUTHENTICATION_TYPE: Database
 DATABASE_SECRET_KEY: db_secret_key
 SECRET_KEY: secret_key
 FEATURE_MAILING: false
-SETUP_COMPLETE: true
