@@ -30,13 +30,18 @@ setfacl -m u:26:-wx $QUAY/postgres-quay
 mkdir -p $QUAY/config
 chmod 777 $QUAY/config
 cp ./config.yaml $QUAY/config
-export SERVER_HOSTNAME="quay-automation1.fyre.ibm.com"
+export SERVER_HOSTNAME="omr-quay1.fyre.ibm.com"
 envsubst < $QUAY/config/config.yaml
 
 
 # create a directory for the storage and provide required permissions
 mkdir -p $QUAY/storage
 chmod 777 $QUAY/storage
+setfacl -m u:1001:-wx $QUAY/storage
+
+#Create a directoru for clair config
+mkdir -p /etc/opt/clairv4/config/
+cd /etc/opt/clairv4/config/
 
 # run quay db container using postgresql image
 podman run -d --rm --name postgresql-quay \
@@ -50,17 +55,27 @@ podman run -d --rm --name postgresql-quay \
 sleep 60
 podman exec -it postgresql-quay /bin/bash -c 'echo "CREATE EXTENSION IF NOT EXISTS pg_trgm" | psql -d quay -U postgres'
 
+
 # run redis container
 podman run -d --rm --name redis \
     -p 6379:6379 \
     -e REDIS_PASSWORD=strongpassword \
     registry.redhat.io/rhel8/redis-6:1-110
 
+#Run postgresql-clairv4
+mkdir -p /opt/quay-poc/postgres-clairv4
+setfacl -m u:26:-wx /opt/quay-poc/postgres-clairv4
+
+podman run -d --name postgresql-clairv4 -e POSTGRESQL_USER=clairuser -e POSTGRESQL_PASSWORD=clairpass -e POSTGRESQL_DATABASE=clair -e POSTGRESQL_ADMIN_PASSWORD=adminpass     -p 5433:5432 -v /opt/quay-poc/postgres-clairv4:/var/lib/pgsql/data:Z registry.redhat.io/rhel8/postgresql-13:1-109
+
+#Start Clair by using the container image
+podman run -d --name clairv4 -p 8081:8081 -p 8088:8088 -e CLAIR_CONF=/clair/config.yaml -e CLAIR_MODE=combo -v /etc/opt/clairv4/config:/clair:Z brew.registry.redhat.io/rh-osbs/quay-clair-rhel8@sha256:72f588b82536f47f2e0da5b1e6bf3644da0ad6b00c610c4dc5d646d0ddc7b695
+
 # run quay app container by mounting config and storage volumes
-podman run -d --rm -p 80:8080 -p 443:8443 --name=quay \
+podman run -d -p 80:8080 -p 443:8443 --name=quay \
   -v $QUAY/config:/conf/stack:Z \
   -v $QUAY/storage:/datastorage:Z \
-  ${STANDALONE_QUAY_IMAGE}
+  brew.registry.redhat.io/rh-osbs/quay-quay-rhel8:v3.10.5-4
 
 sleep 60
 podman ps -a

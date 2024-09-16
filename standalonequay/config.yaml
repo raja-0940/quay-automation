@@ -5,16 +5,16 @@ REGISTRY_TITLE_SHORT: Red Hat Quay
 DB_CONNECTION_ARGS:
     autorollback: true
     threadlocals: true
-DB_URI: postgresql://quayuser:quaypass@${SERVER_HOSTNAME}:5433/quay
+DB_URI: postgresql://quayuser:quaypass@omr-quay1.fyre.ibm.com:5433/quay
 BUILDLOGS_REDIS:
-    host: ${SERVER_HOSTNAME}
+    host: omr-quay1.fyre.ibm.com
     password: strongpassword
     port: 6379
 USER_EVENTS_REDIS:
-    host: ${SERVER_HOSTNAME}
+    host: omr-quay1.fyre.ibm.com
     port: 6379
     password: strongpassword
-SERVER_HOSTNAME: ${SERVER_HOSTNAME}
+SERVER_HOSTNAME: omr-quay1.fyre.ibm.com
 DISTRIBUTED_STORAGE_CONFIG:
     default:
         - LocalStorage
