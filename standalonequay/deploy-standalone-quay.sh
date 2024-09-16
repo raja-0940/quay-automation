@@ -30,7 +30,10 @@ setfacl -m u:26:-wx $QUAY/postgres-quay
 mkdir -p $QUAY/config
 chmod 777 $QUAY/config
 cp ./config.yaml $QUAY/config
-export SERVER_HOSTNAME="quay-automation1.fyre.ibm.com"
+cp ./ssl.cert $QUAY/config
+cp ./ssl.key $QUAY/config
+chmod 777 $QUAY/config/ssl.*
+export SERVER_HOSTNAME="standalone-automation1.fyre.ibm.com"
 envsubst < $QUAY/config/config.yaml
 
 
@@ -57,7 +60,7 @@ podman run -d --rm --name redis \
     registry.redhat.io/rhel8/redis-6:1-110
 
 # run quay app container by mounting config and storage volumes
-podman run -d --rm -p 80:8080 -p 443:8443 --name=quay \
+podman run -d -p 80:8080 -p 443:8443 --name=quay \
   -v $QUAY/config:/conf/stack:Z \
   -v $QUAY/storage:/datastorage:Z \
   ${STANDALONE_QUAY_IMAGE}

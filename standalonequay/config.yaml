@@ -5,16 +5,16 @@ REGISTRY_TITLE_SHORT: Red Hat Quay
 DB_CONNECTION_ARGS:
     autorollback: true
     threadlocals: true
-DB_URI: postgresql://quayuser:quaypass@${SERVER_HOSTNAME}:5433/quay
+DB_URI: postgresql://quayuser:quaypass@standalone-automation1.fyre.ibm.com:5432/quay
 BUILDLOGS_REDIS:
-    host: ${SERVER_HOSTNAME}
+    host: standalone-automation1.fyre.ibm.com
     password: strongpassword
     port: 6379
 USER_EVENTS_REDIS:
-    host: ${SERVER_HOSTNAME}
+    host: standalone-automation1.fyre.ibm.com
     port: 6379
     password: strongpassword
-SERVER_HOSTNAME: ${SERVER_HOSTNAME}
+SERVER_HOSTNAME: standalone-automation1.fyre.ibm.com
 DISTRIBUTED_STORAGE_CONFIG:
     default:
         - LocalStorage
@@ -26,3 +26,7 @@ AUTHENTICATION_TYPE: Database
 DATABASE_SECRET_KEY: db_secret_key
 SECRET_KEY: secret_key
 FEATURE_MAILING: false
+SETUP_COMPLETE: true
+# SSL Certificate and Key Configurations
+SSL_CERT_PATH: /root/quay/config/ssl.cert
+SSL_KEY_PATH: /root/quay/config/ssl.key
