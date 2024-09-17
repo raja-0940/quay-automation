@@ -20,3 +20,8 @@ DEST_TAG="<dest-tag>"
 DEST_REG_USER_NAME="<dest-reg-user>"
 DEST_REG_PASSWORD="<dest-reg-password>"
 QUAY_API_TOKEN="<dest-reg-api-token>"
+
+#Client variable.
+CLIENT_PASSWORD="<>" 
+CLIENT_HOSTNAME="<>"  #hostname of client machine
+
