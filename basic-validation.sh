@@ -231,3 +231,16 @@ function pullImageManifestFromSchema1 {
 }
 
 # pullImageManifestFromSchema1
+
+## OCP-42366: [Quay] Check operator versions in catalogsource
+
+function CheckOperatorVersionsInCatalogSource {
+
+  # Create catalogsource by index images in openshift
+  echo "catalog sources in openshift-marketplace namespace"
+  echo "$(oc get catalogsource -n openshift-marketplace)"
+  echo "***verify catalog source for latest quay operator***"
+  
+
+
+}
