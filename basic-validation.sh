@@ -236,11 +236,16 @@ function pullImageManifestFromSchema1 {
 
 function CheckOperatorVersionsInCatalogSource {
 
+  # Verify OCP version
+  oc --version
   # Create catalogsource by index images in openshift
   echo "catalog sources in openshift-marketplace namespace"
-  echo "$(oc get catalogsource -n openshift-marketplace)"
+  oc get catalogsource -n openshift-marketplace
   echo "***verify catalog source for latest quay operator***"
-  
-
+  oc get catalogsource quay-catsrc-313-415 -n openshift-marketplace -o yaml
+  QUAY_OPERATOR_POD="$(oc get pods -n openshift-marketplace | grep quay-catsrc-* | cut -d ' ' -f1)"
+  oc exec ${QUAY_OPERATOR_POD} -n openshift-marketplace -- sh -c "cat /configs/quay-operator/catalog.json |grep olm.channel -A 40"
 
 }
+
+# CheckOperatorVersionsInCatalogSource
