@@ -61,7 +61,7 @@ podman run -d --rm --name redis \
     registry.redhat.io/rhel8/redis-6:1-110
 
 # run quay app container by mounting config and storage volumes
-podman run -d -p 80:8080 -p 443:8443 --name=quay \
+podman run -d --rm -p 80:8080 -p 443:8443 --name=quay \
   -v $QUAY/config:/conf/stack:Z \
   -v $QUAY/storage:/datastorage:Z \
   ${STANDALONE_QUAY_IMAGE}
