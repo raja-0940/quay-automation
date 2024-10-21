@@ -5,7 +5,7 @@ REGISTRY_TITLE_SHORT: Red Hat Quay
 DB_CONNECTION_ARGS:
     autorollback: true
     threadlocals: true
-DB_URI: postgresql://quayuser:quaypass@${SERVER_HOSTNAME}:5433/quay
+DB_URI: postgresql://quayuser:quaypass@${SERVER_HOSTNAME}:5432/quay
 BUILDLOGS_REDIS:
     host: ${SERVER_HOSTNAME}
     password: strongpassword
@@ -26,3 +26,7 @@ AUTHENTICATION_TYPE: Database
 DATABASE_SECRET_KEY: db_secret_key
 SECRET_KEY: secret_key
 FEATURE_MAILING: false
+SETUP_COMPLETE: true
+# SSL Certificate and Key Configurations
+SSL_CERT_PATH: /root/quay/config/ssl.cert
+SSL_KEY_PATH: /root/quay/config/ssl.key

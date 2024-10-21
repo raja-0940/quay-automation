@@ -30,8 +30,12 @@ setfacl -m u:26:-wx $QUAY/postgres-quay
 mkdir -p $QUAY/config
 chmod 777 $QUAY/config
 cp ./config.yaml $QUAY/config
-export SERVER_HOSTNAME="quay-automation1.fyre.ibm.com"
-envsubst < $QUAY/config/config.yaml
+cp ./ssl.cert $QUAY/config
+cp ./ssl.key $QUAY/config
+chmod 777 $QUAY/config/ssl.*
+export SERVER_HOSTNAME="smita1.fyre.ibm.com"
+envsubst '${SERVER_HOSTNAME}' < $QUAY/config/config.yaml > $QUAY/config/config_tmp.yaml
+mv -f $QUAY/config/config_tmp.yaml $QUAY/config/config.yaml
 
 
 # create a directory for the storage and provide required permissions
