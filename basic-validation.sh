@@ -193,3 +193,35 @@ EOF
 }
 
 # deployQuayregistrywithAllManagedComponents
+
+## OCP-22450: [Quay] Pull an image stored as manifest schema 2 via schema 1
+function pullImageManifestFromSchema1 {
+
+  # check and install python3.11
+  if [ $(python3.11 -V | cut -d ' ' -f2) == 3.11.* ]; then
+    echo "Python 3.11 is available"
+  else
+    echo "Installing python3.11.."
+    yum install -y python3.11
+    echo "Installed $(python3.11 -V)"
+  fi
+
+  # create an organization named 'v22test'    
+  curl -k -X POST -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
+  https://${DEST_REGISTRY}/api/v1/repository -d '{"name": "v22test"}'
+
+  # Push image via manifest schema 2
+  podman login -u ${SRC_REG_USER_NAME} -p ${SRC_REG_PASSWORD} ${SRC_REGISTRY}
+  podman pull ${SRC_REGISTRY}/${SRC_REPO}/${SRC_IMAGE}:${SRC_TAG}
+  sleep 20
+  podman tag ${SRC_REGISTRY}/${SRC_REPO}/${SRC_IMAGE}:${SRC_TAG} ${DEST_REGISTRY}/v22test/${DEST_IMAGE}:${DEST_TAG}
+  podman login -u ${DEST_REG_USER_NAME} -p ${DEST_REG_PASSWORD} ${DEST_REGISTRY} --tls-verify=false
+  podman push --tls-verify=false ${DEST_REGISTRY}/v22test/${DEST_IMAGE}:${DEST_TAG}
+  sleep 30
+  podman ps -a
+
+  # Pull image via manifest schema 1
+  curl -k -v -X GET -H "Accept: application/vnd.docker.distribution.manifest.v1+json" \
+  "https://${DEST_REGISTRY}/v2/v22test/${DEST_IMAGE}/manifests/${DEST_TAG}" | python3.11 -m json.tool
+
+}
