@@ -208,7 +208,7 @@ function pullImageManifestFromSchema1 {
 
   # create an organization named 'v22test'    
   curl -k -X POST -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
-  https://${DEST_REGISTRY}/api/v1/repository -d '{"name": "v22test"}'
+  https://${DEST_REGISTRY}/api/v1/organization/ -d '{"name": "v22test"}'
 
   # Push image via manifest schema 2
   podman login -u ${SRC_REG_USER_NAME} -p ${SRC_REG_PASSWORD} ${SRC_REGISTRY}
@@ -219,9 +219,15 @@ function pullImageManifestFromSchema1 {
   podman push --tls-verify=false ${DEST_REGISTRY}/v22test/${DEST_IMAGE}:${DEST_TAG}
   sleep 30
   podman ps -a
+  # Change repository visibility to public
+  curl -k -X POST -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
+  https://${DEST_REGISTRY}/api/v1/repository/v22test/busybox/changevisibility \
+  -d '{"repo_kind": "image", "namespace": "v22test", "visibility": "public", "repository": "busybox",  "description": "repository visibility is changed to public"}'
 
   # Pull image via manifest schema 1
   curl -k -v -X GET -H "Accept: application/vnd.docker.distribution.manifest.v1+json" \
   "https://${DEST_REGISTRY}/v2/v22test/${DEST_IMAGE}/manifests/${DEST_TAG}" | python3.11 -m json.tool
 
 }
+
+# pullImageManifestFromSchema1
