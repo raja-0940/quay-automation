@@ -193,3 +193,59 @@ EOF
 }
 
 # deployQuayregistrywithAllManagedComponents
+
+## OCP-22450: [Quay] Pull an image stored as manifest schema 2 via schema 1
+function pullImageManifestFromSchema1 {
+
+  # check and install python3.11
+  if [ $(python3.11 -V | cut -d ' ' -f2) == 3.11.* ]; then
+    echo "Python 3.11 is available"
+  else
+    echo "Installing python3.11.."
+    yum install -y python3.11
+    echo "Installed $(python3.11 -V)"
+  fi
+
+  # create an organization named 'v22test'    
+  curl -k -X POST -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
+  https://${DEST_REGISTRY}/api/v1/organization/ -d '{"name": "v22test"}'
+
+  # Push image via manifest schema 2
+  podman login -u ${SRC_REG_USER_NAME} -p ${SRC_REG_PASSWORD} ${SRC_REGISTRY}
+  podman pull ${SRC_REGISTRY}/${SRC_REPO}/${SRC_IMAGE}:${SRC_TAG}
+  sleep 20
+  podman tag ${SRC_REGISTRY}/${SRC_REPO}/${SRC_IMAGE}:${SRC_TAG} ${DEST_REGISTRY}/v22test/${DEST_IMAGE}:${DEST_TAG}
+  podman login -u ${DEST_REG_USER_NAME} -p ${DEST_REG_PASSWORD} ${DEST_REGISTRY} --tls-verify=false
+  podman push --tls-verify=false ${DEST_REGISTRY}/v22test/${DEST_IMAGE}:${DEST_TAG}
+  sleep 30
+  podman ps -a
+  # Change repository visibility to public
+  curl -k -X POST -H "Authorization: Bearer ${QUAY_API_TOKEN}" -H "Content-Type: application/json" \
+  https://${DEST_REGISTRY}/api/v1/repository/v22test/busybox/changevisibility \
+  -d '{"repo_kind": "image", "namespace": "v22test", "visibility": "public", "repository": "busybox",  "description": "repository visibility is changed to public"}'
+
+  # Pull image via manifest schema 1
+  curl -k -v -X GET -H "Accept: application/vnd.docker.distribution.manifest.v1+json" \
+  "https://${DEST_REGISTRY}/v2/v22test/${DEST_IMAGE}/manifests/${DEST_TAG}" | python3.11 -m json.tool
+
+}
+
+# pullImageManifestFromSchema1
+
+## OCP-42366: [Quay] Check operator versions in catalogsource
+
+function CheckOperatorVersionsInCatalogSource {
+
+  # Verify OCP version
+  oc --version
+  # Create catalogsource by index images in openshift
+  echo "catalog sources in openshift-marketplace namespace"
+  oc get catalogsource -n openshift-marketplace
+  echo "***verify catalog source for latest quay operator***"
+  oc get catalogsource quay-catsrc-313-415 -n openshift-marketplace -o yaml
+  QUAY_OPERATOR_POD="$(oc get pods -n openshift-marketplace | grep quay-catsrc-* | cut -d ' ' -f1)"
+  oc exec ${QUAY_OPERATOR_POD} -n openshift-marketplace -- sh -c "cat /configs/quay-operator/catalog.json |grep olm.channel -A 40"
+
+}
+
+# CheckOperatorVersionsInCatalogSource
