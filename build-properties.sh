@@ -20,3 +20,9 @@ export AWS_S3_BUCKET_NAME=""
 export SERVER_HOSTNAME=""
 export AWS_HOST=""
 
+## define following environment varibles for to test quay registry with unmanaged netapp
+export NETAPP_S3_BUCKET_NAME="redhat-quay1"
+export NETAPP_TENANT_ACCESS_KEY="******"
+export NETAPP_TENANT_SECRET_KEY="********"
+export NETAPP_S3_ENDPOINT="https://webscalenext.netapp.com"
+export NETAPP_TENANT_REGION="us-east-1"

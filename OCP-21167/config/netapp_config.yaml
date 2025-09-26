@@ -1,0 +1,33 @@
+SERVER_HOSTNAME: <quay-endpoint>
+EXTERNAL_TLS_TERMINATION: false
+PREFERRED_URL_SCHEME: https
+REGISTRY_TITLE_SHORT: Red Hat Quay
+SETUP_COMPLETE: true
+TAG_EXPIRATION_OPTIONS:
+- 2w
+TEAM_RESYNC_STALE_TIME: 60m
+TESTING: false
+FEATURE_PROXY_CACHE: true
+FEATURE_UI_V2: true
+FEATURE_UI_V2_REPO_SETTINGS: true
+FEATURE_AUTO_PRUNE: true
+DEFAULT_TAG_EXPIRATION: 2w
+DISTRIBUTED_STORAGE_CONFIG:
+    local_us:
+        - RadosGWStorage
+        - hostname: webscaledemo.netapp.com
+          access_key: <netapp-access-key>
+          bucket_name: <bucket-name>
+          is_secure: true
+          port: 443
+          secret_key: <netapp-secret-key>
+          storage_path: /datastorage/registry
+DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS:
+- local_us
+DISTRIBUTED_STORAGE_PREFERENCE:
+- local_us
+ROBOTS_DISALLOW: false
+BROWSER_API_CALLS_XHR_ONLY: false
+SUPER_USERS:
+  - quay
+
